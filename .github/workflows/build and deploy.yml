@@ -1,0 +1,37 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+        php-version: [8.2]
+
+    steps:
+    - name: Checkout del repositorio
+      uses: actions/checkout@v4
+
+    - name: Configurar entorno PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version:  ${{ matrix.php-version }}
+  
+    - name: Deploy to shared hosting
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: abelabed.com
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./
+        server-dir: /api/
+        # exlude public folder
+        exclude: public/**
+    # now we deploy the public folder manually to the public_html /api/ folder on the server BECAUSE we need changes the routes in the index.php file
+      
+
